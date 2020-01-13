@@ -142,6 +142,7 @@ keyboardInput = ->
 puzzle = null
 solutions = null
 solWhich = null
+xhr = null
 
 solve = ->
   solutions = []
@@ -157,6 +158,7 @@ solve = ->
       "&#{id}=#{document.getElementById(id).value}"
   ).join('') +
   "&reflex=#{if document.getElementById('reflex').checked then 1 else 0}"
+  xhr?.abort()
   xhr = new XMLHttpRequest
   xhr.open 'GET', url
   xhr.onprogress = ->
