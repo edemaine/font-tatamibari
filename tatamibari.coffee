@@ -60,7 +60,6 @@ class PuzzleDisplay
 
   drawEdges: ->
     @edgesGroup.clear()
-    console.log @puzzle.solution
     for x in [0...@puzzle.nx]
       for y in [0...@puzzle.ny]
         if x > 0 and @puzzle.solution[[x-1,y]] != @puzzle.solution[[x,y]]
