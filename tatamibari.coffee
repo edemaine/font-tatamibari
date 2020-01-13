@@ -148,6 +148,16 @@ solve = ->
           json = JSON.parse line
         catch
           continue
+        if json.warn?
+          document.getElementById 'result'
+          .innerHTML += "<p><b>WARNING: #{json.warn}</b></p>"
+          continue
+        if json.error?
+          document.getElementById 'result'
+          .innerHTML += "<p><b>ERROR: #{json.error}</b></p>" +
+                        "<pre>#{json.traceback}</pre>"
+          continue
+        json
     document.getElementById 'solCount'
     .innerHTML = solutions.length
     showSolution 0 unless solWhich?

@@ -5,6 +5,7 @@ import sys, collections, z3, re, argparse
 from enum import Enum
 from operator import itemgetter
 from typing import List, Set, Dict, Iterator
+warn = print
 
 Point = collections.namedtuple('Point', ['r', 'c'])
 Rect = collections.namedtuple('Rect', ['r', 'c', 'h', 'w'])
@@ -106,10 +107,10 @@ def solve(puzzle: Puzzle, forced_rects: Set[Rect] = frozenset(),
 
     for cell, rects in cell_to_rects.items():
         if not rects:
-            print('cell', cell, 'has no covering rects')
+            warn('cell', cell, 'has no covering rects')
     for clue_cell, rects in clue_to_rects.items():
         if not rects:
-            print('clue', puzzle.clues[clue_cell], 'in', clue_cell, 'has no candidate rects')
+            warn('clue', puzzle.clues[clue_cell], 'in', clue_cell, 'has no candidate rects')
 
     solver = z3.Optimize()
     for c in puzzle.cells:
