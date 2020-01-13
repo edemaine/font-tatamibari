@@ -6,13 +6,25 @@ html
     style
       include:stylus tatamibari.styl
   body
-    table(width="100%")
+    table
       tr
         td(style="text-align: left; vertical-align: middle")
           h1 Tatamibari Designer
         td(style="text-align: right; vertical-align: middle")
           h2 by <A HREF="http://erikdemaine.org/">Erik&nbsp;Demaine</A> and <A HREF="http://martindemaine.org">Martin&nbsp;Demaine</A>, 2019
-    table#gui(style="width: 100%")
+    table
+      button#solve Solve
+    p
+    table#gui
+      tr
+        th Puzzle
+        th
+          | Solution 
+          span#solWhich ?
+          |  of 
+          span#solCount ?
+          button#solPrev prev
+          button#solNext next
       tr
         td#design.root(style="width: 50%")
         td#result.root(style="width: 50%")

@@ -2,6 +2,8 @@
 minorWidth = 0.05
 majorWidth = 0.15
 
+server = 'http://demaine.csail.mit.edu/tatamibari/'
+
 symbolMap =
   '-': 'h'
   '|': 'v'
@@ -9,6 +11,12 @@ symbolMap =
 
 class Puzzle
   constructor: (@nx, @ny, @clues = {}, @solution = {}) ->
+  asciiClues: ->
+    (for y in [0...@ny]
+      (for x in [0...@nx]
+        @clues[[x,y]] or ' '
+      ).join ''
+    ).join '\n'
 
 class PuzzleDisplay
   constructor: (@svg, @puzzle) ->
@@ -117,11 +125,54 @@ keyboardInput = ->
   #      e.stopPropagation()
   #      selected.set selected.selected, num
 
+puzzle = null
+solutions = null
+solWhich = null
+
+solve = ->
+  solutions = null
+  for id in ['solCount', 'solWhich']
+    document.getElementById id
+    .innerHTML = '?'
+  url = "#{server}?puzzle=#{encodeURIComponent puzzle.asciiClues()}"
+  xhr = new XMLHttpRequest
+  xhr.open 'GET', url
+  xhr.onprogress = ->
+    solutions =
+      for line in xhr.response.split '\n'
+        try
+          json = JSON.parse line
+        catch
+          continue
+    document.getElementById 'solCount'
+    .innerHTML = solutions.length
+    showSolution 0 unless solWhich?
+  xhr.send()
+
+showSolution = (which) ->
+  return unless 0 <= which < solutions.length
+  solWhich = which
+  document.getElementById 'solWhich'
+  .innerHTML = which+1
+  document.getElementById 'result'
+  .innerHTML = ''
+  solution = solutions[solWhich]
+  #solPuzzle = new Puzzle solution.nx, solution.ny, solution.clues, solution.solution
+  #resultSVG = SVG().addTo '#result'
+  #new PuzzleDisplay resultSVG, solPuzzle
+
 designGUI = ->
   designSVG = SVG().addTo '#design'
-  resultSVG = SVG().addTo '#result'
-  tata = new PuzzleEditor designSVG, new Puzzle 5, 5
+  new PuzzleEditor designSVG, puzzle = new Puzzle 5, 5
   keyboardInput()
+  document.getElementById 'solve'
+  .addEventListener 'click', solve
+  document.getElementById 'solPrev'
+  .addEventListener 'click', ->
+    showSolution solWhich - 1
+  document.getElementById 'solNext'
+  .addEventListener 'click', ->
+    showSolution solWhich + 1
 
 window?.onload = ->
   if document.getElementById 'design'
