@@ -213,7 +213,7 @@ showSolution = (which) ->
 
 designGUI = ->
   designSVG = SVG().addTo '#design'
-  new PuzzleEditor designSVG, puzzle = new Puzzle 5, 5
+  new PuzzleEditor designSVG, puzzle = new Puzzle 10, 10
   keyboardInput()
   document.getElementById 'solve'
   .addEventListener 'click', solve
