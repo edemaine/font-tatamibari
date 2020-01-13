@@ -144,7 +144,7 @@ solutions = null
 solWhich = null
 
 solve = ->
-  solutions = null
+  solutions = []
   solWhich = null
   for id in ['solCount', 'solWhich']
     document.getElementById id
