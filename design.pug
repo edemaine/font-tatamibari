@@ -1,0 +1,18 @@
+html
+  head
+    title Tatamibari Designer
+    script(type="text/javascript", src="node_modules/@svgdotjs/svg.js/dist/svg.min.js")
+    script(type="text/javascript", src="tatamibari.js")
+    style
+      include:stylus tatamibari.styl
+  body
+    table(width="100%")
+      tr
+        td(style="text-align: left; vertical-align: middle")
+          h1 Tatamibari Designer
+        td(style="text-align: right; vertical-align: middle")
+          h2 by <A HREF="http://erikdemaine.org/">Erik&nbsp;Demaine</A> and <A HREF="http://martindemaine.org">Martin&nbsp;Demaine</A>, 2019
+    table#gui(style="width: 100%")
+      tr
+        td#design.root(style="width: 50%")
+        td#result.root(style="width: 50%")
