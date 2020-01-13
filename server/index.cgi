@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import itertools, json, sys
 import cgi, cgitb
 cgitb.enable()
 import tatamibari_solver
@@ -18,17 +19,20 @@ resource.setrlimit(resource.RLIMIT_CPU, (60*5, 60*10)) # 5-10 minutes
 # Get parameters
 data = cgi.FieldStorage()
 solutions = int(data.getfirst('solutions', '2'))
-puzzle = data.getfirst('puzzle')
-clues = data.getfirst('clues', 'hard')
-assert clues in ['hard', 'ignore']
-covers = data.getfirst('covers', 'exact')
-assert covers in ['exact', 'subset', 'superset', 'incomparable', 'ignore']
-corners = data.getfirst('corners', 'hard')
-assert corners in ['hard', 'soft', 'ignore']
-reflex_corners = bool(int(data.getfirst('reflex_corners', '0')))
+puzzleText = data.getfirst('puzzle')
+assert isinstance(puzzleText, str)
+settings = {}
+settings['clue_constraints'] = data.getfirst('clues', 'hard')
+assert settings['clue_constraints'] in ['hard', 'ignore']
+settings['cover_constraints'] = data.getfirst('covers', 'exact')
+assert settings['cover_constraints'] in ['exact', 'subset', 'superset', 'incomparable', 'ignore']
+settings['corner_constraints'] = data.getfirst('corners', 'hard')
+assert settings['corner_constraints'] in ['hard', 'soft', 'ignore']
+settings['reflex_three_corners'] = bool(int(data.getfirst('reflex', '0')))
 
-import sys, time
-for i in range(10):
-  sys.stdout.flush()
-  time.sleep(1)
-  print('{"round": '+str(i)+'}')
+puzzle = tatamibari_solver.parse(puzzleText.split('\n'))
+soln_gen = tatamibari_solver.solve(puzzle, **settings)
+for i, soln in enumerate(itertools.islice(soln_gen, solutions)):
+    text = tatamibari_solver.format_soln(puzzle, soln)
+    print(json.dumps([line.split('\t') for line in text.split('\n')]))
+    sys.stdout.flush()

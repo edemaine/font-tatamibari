@@ -160,10 +160,20 @@ showSolution = (which) ->
   .innerHTML = which+1
   document.getElementById 'result'
   .innerHTML = ''
-  solution = solutions[solWhich]
-  #solPuzzle = new Puzzle solution.nx, solution.ny, solution.clues, solution.solution
-  #resultSVG = SVG().addTo '#result'
-  #new PuzzleDisplay resultSVG, solPuzzle
+  clues = {}
+  numbers = {}
+  for row, y in solutions[solWhich]
+    for char, x in row
+      match = /^([0-9]*)([\-+| ]?)$/.exec char
+      unless match?
+        throw new Error "invalid key '#{char}'"
+      number = parseInt match[1]
+      number = undefined if isNaN number
+      numbers[[x,y]] = number
+      clues[[x,y]] = match[2]
+  solPuzzle = new Puzzle puzzle.nx, puzzle.ny, clues, numbers
+  resultSVG = SVG().addTo '#result'
+  new PuzzleDisplay resultSVG, solPuzzle
 
 designGUI = ->
   designSVG = SVG().addTo '#design'
