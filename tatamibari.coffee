@@ -222,6 +222,17 @@ designGUI = ->
   document.getElementById 'solNext'
   .addEventListener 'click', ->
     showSolution solWhich + 1
+  window.addEventListener 'resize', resizer = ->
+    resize 'design'
+    document.getElementById('result').style.height =
+      document.getElementById('design').style.height
+  resizer()
+
+resize = (id) ->
+  offset = document.getElementById(id).getBoundingClientRect()
+  console.log offset.top, window.innerHeight
+  height = Math.max 100, window.innerHeight - offset.top
+  document.getElementById(id).style.height = "#{height}px"
 
 window?.onload = ->
   if document.getElementById 'design'
