@@ -152,6 +152,7 @@ solve = ->
     .innerHTML = '?'
   document.getElementById 'result'
   .innerHTML = ''
+  maxSolutions = parseInt document.getElementById('solutions').value
   url = "#{server}?puzzle=#{encodeURIComponent puzzle.asciiClues()}" + (
     for id in ['solutions', 'clues', 'cover', 'corners']
       "&#{id}=#{document.getElementById(id).value}"
@@ -177,8 +178,15 @@ solve = ->
           continue
         json
     document.getElementById 'solCount'
-    .innerHTML = solutions.length
+    .innerHTML = solutions.length + '?'
     showSolution 0 unless solWhich?
+  xhr.onload = ->
+    if solutions.length == maxSolutions
+      document.getElementById 'solCount'
+      .innerHTML = solutions.length + '+'
+    else
+      document.getElementById 'solCount'
+      .innerHTML = solutions.length + '!'
   xhr.send()
 
 showSolution = (which) ->
