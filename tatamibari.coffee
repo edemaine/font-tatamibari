@@ -24,8 +24,11 @@ class PuzzleDisplay
     .addClass 'squares'
     @gridGroup = @svg.group()
     .addClass 'grid'
+    @edgesGroup = @svg.group()
+    .addClass 'edges'
     @drawGrid()
     @drawSquares()
+    @drawEdges()
 
   drawGrid: ->
     @gridGroup.clear()
@@ -54,6 +57,16 @@ class PuzzleDisplay
           group: group
           use: group.use symbolMap[@puzzle.clues[[x,y]]]
                .size 1, 1
+
+  drawEdges: ->
+    @edgesGroup.clear()
+    console.log @puzzle.solution
+    for x in [0...@puzzle.nx]
+      for y in [0...@puzzle.ny]
+        if x > 0 and @puzzle.solution[[x-1,y]] != @puzzle.solution[[x,y]]
+          @edgesGroup.line x, y, x, y+1
+        if y > 0 and @puzzle.solution[[x,y-1]] != @puzzle.solution[[x,y]]
+          @edgesGroup.line x, y, x+1, y
 
 selected = null
 
