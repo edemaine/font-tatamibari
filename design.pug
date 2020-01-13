@@ -16,8 +16,8 @@ html
       tr
         td
           .input
-            label(for="solutions") Solutions:
-            input#solutions(type="text", size="2", value="2")
+            label(for="solutions") Requested solutions:
+            input#solutions(type="text", size="2", value="10")
           .input
             label(for="clues") Clue constraints:
             select#clues
@@ -32,7 +32,7 @@ html
               option(value="incomparable") Incomparable
               option(value="ignore") Ignore
           .input
-            label(for="corners") Corner constraints:
+            label(for="corners") 4-corner constraints:
             select#corners
               option(value="hard", selected) Hard
               option(value="soft") Soft
