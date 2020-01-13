@@ -14,7 +14,7 @@ class Puzzle
   asciiClues: ->
     (for y in [0...@ny]
       (for x in [0...@nx]
-        @clues[[x,y]] or ' '
+        @clues[[x,y]] or '.'
       ).join ''
     ).join '\n'
 
