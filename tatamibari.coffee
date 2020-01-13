@@ -151,7 +151,11 @@ solve = ->
     .innerHTML = '?'
   document.getElementById 'result'
   .innerHTML = ''
-  url = "#{server}?puzzle=#{encodeURIComponent puzzle.asciiClues()}"
+  url = "#{server}?puzzle=#{encodeURIComponent puzzle.asciiClues()}" + (
+    for id in ['solutions', 'clues', 'cover', 'corners']
+      "&#{id}=#{document.getElementById(id).value}"
+  ).join('') +
+  "&reflex=#{if document.getElementById('reflex').checked then 1 else 0}"
   xhr = new XMLHttpRequest
   xhr.open 'GET', url
   xhr.onprogress = ->

@@ -13,7 +13,35 @@ html
         td(style="text-align: right; vertical-align: middle")
           h2 by <A HREF="http://erikdemaine.org/">Erik&nbsp;Demaine</A> and <A HREF="http://martindemaine.org">Martin&nbsp;Demaine</A>, 2019
     table
-      button#solve Solve
+      tr
+        td
+          .input
+            label(for="solutions") Solutions:
+            input#solutions(type="text", size="2", value="2")
+          .input
+            label(for="clues") Clue constraints:
+            select#clues
+              option(value="hard", selected) Hard
+              option(value="ignore") Ignore
+          .input
+            label(for="cover") Cover constraints:
+            select#cover
+              option(value="exact", selected) Exact
+              option(value="subset") Subset
+              option(value="superset") Superset
+              option(value="incomparable") Incomparable
+              option(value="ignore") Ignore
+          .input
+            label(for="corners") Corner constraints:
+            select#corners
+              option(value="hard", selected) Hard
+              option(value="soft") Soft
+              option(value="ignore") Ignore
+          .input
+            label(for="reflex") Reflex three corners:
+            input#reflex(type="checkbox", checked)
+        td
+          button#solve Solve
     p
     table#gui
       tr
