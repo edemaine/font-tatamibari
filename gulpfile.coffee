@@ -33,7 +33,7 @@ exports.pug = pug = ->
 exports.watch = watch = ->
   gulp.watch '*.coffee', coffee
   gulp.watch '*.pug', pug
-  #gulp.watch '*.styl', stylus
+  gulp.watch '*.styl', pug #stylus
 
 exports.default = gulp.series ...[
   gulp.parallel coffee, pug#, stylus
