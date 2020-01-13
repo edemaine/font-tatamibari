@@ -17,6 +17,14 @@ class Puzzle
         @clues[[x,y]] or '.'
       ).join ''
     ).join '\n'
+  @asciiCluesLoad: (ascii) ->
+    lines = ascii.split '\n'
+    clues = {}
+    for line, y in lines
+      for char, x in line
+        if char != '.'
+          clues[[x,y]] = char
+    new @ (Math.max ...(line.length for line in lines)), lines.length, clues
 
 class PuzzleDisplay
   constructor: (@svg, @puzzle) ->
@@ -99,6 +107,8 @@ class PuzzleEditor extends PuzzleDisplay
   set: ([x, y], value) ->
     @puzzle.clues[[x,y]] = value
     @squares[[x,y]].use.attr 'href', '#' + symbolMap[value]
+    history.pushState null, 'tatamibari',
+      "#{document.location.pathname}?puzzle=#{encodeURIComponent puzzle.asciiClues()}"
 
 keyMap =
   '-': '-'
@@ -229,6 +239,21 @@ designGUI = ->
     document.getElementById('result').style.height =
       document.getElementById('design').style.height
   resizer()
+
+  window.addEventListener 'popstate', load = ->
+    if data = getParameterByName 'puzzle'
+      designSVG.clear()
+      new PuzzleEditor designSVG, puzzle = Puzzle.asciiCluesLoad data
+  load()
+
+getParameterByName = (name) ->
+  name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]")
+  regex = new RegExp "[\\?&]" + name + "=([^&#]*)"
+  results = regex.exec location.search
+  if results == null
+    null
+  else
+    decodeURIComponent results[1].replace(/\+/g, " ")
 
 resize = (id) ->
   offset = document.getElementById(id).getBoundingClientRect()
