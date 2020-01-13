@@ -1,9 +1,15 @@
 // These widths must match minorWidth and majorWidth in sudoku.coffee
-svg .grid
-  line
-    stroke-width: 0.05
-    stroke: #666
-    stroke-linecap: square
-  line.border
+svg .grid line
+  stroke-width: 0.05
+  stroke: #666
+  stroke-linecap: square
+
+  &.border
     stroke-width: 0.15
     stroke: black
+
+svg .squares rect
+  fill: white
+  cursor: pointer
+  &.selected
+    fill: hsl(50,100%,50%) // based on #ffda00 from NYTimes
