@@ -1,0 +1,8 @@
+AddHandler cgi-script .py
+DirectoryIndex index.html index.py
+
+<IfModule mod_python.c>
+  AddHandler mod_python .py
+  PythonHandler mod_python_handler
+  #PythonDebug On
+</IfModule>
