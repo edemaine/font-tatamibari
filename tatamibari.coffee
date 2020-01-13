@@ -232,7 +232,6 @@ designGUI = ->
 
 resize = (id) ->
   offset = document.getElementById(id).getBoundingClientRect()
-  console.log offset.top, window.innerHeight
   height = Math.max 100, window.innerHeight - offset.top
   document.getElementById(id).style.height = "#{height}px"
 
