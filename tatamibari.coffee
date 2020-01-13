@@ -146,6 +146,7 @@ solWhich = null
 
 solve = ->
   solutions = null
+  solWhich = null
   for id in ['solCount', 'solWhich']
     document.getElementById id
     .innerHTML = '?'
