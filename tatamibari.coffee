@@ -90,9 +90,11 @@ class PuzzleEditor extends PuzzleDisplay
 
 keyMap =
   '-': '-'
+  '_': '-'
+  '=': '+'
   '+': '+'
-  '|': '|'
   '\\': '|'
+  '|': '|'
   Delete: null
   Backspace: null
 
@@ -134,6 +136,8 @@ solve = ->
   for id in ['solCount', 'solWhich']
     document.getElementById id
     .innerHTML = '?'
+  document.getElementById 'result'
+  .innerHTML = ''
   url = "#{server}?puzzle=#{encodeURIComponent puzzle.asciiClues()}"
   xhr = new XMLHttpRequest
   xhr.open 'GET', url
