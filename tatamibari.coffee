@@ -107,6 +107,8 @@ class PuzzleEditor extends PuzzleDisplay
   set: ([x, y], value) ->
     @puzzle.clues[[x,y]] = value
     @squares[[x,y]].use.attr 'href', '#' + symbolMap[value]
+    @pushState()
+  pushState: ->
     history.pushState null, 'tatamibari',
       "#{document.location.pathname}?puzzle=#{encodeURIComponent puzzle.asciiClues()}"
 
@@ -245,6 +247,15 @@ designGUI = ->
       designSVG.clear()
       new PuzzleEditor designSVG, puzzle = Puzzle.asciiCluesLoad data
   load()
+
+  document.getElementById 'reset'
+  .addEventListener 'click', ->
+    width = parseInt document.getElementById('width').value
+    height = parseInt document.getElementById('height').value
+    return if isNaN(width) or isNaN(height)
+    designSVG.clear()
+    new PuzzleEditor designSVG, puzzle = new Puzzle width, height
+    .pushState()
 
 getParameterByName = (name) ->
   name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]")
