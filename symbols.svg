@@ -1,0 +1,14 @@
+<svg id="symbols" width="0" height="0">
+  <defs>
+    <symbol id="h" viewBox="-0.50 -0.50 1.00 1.00">
+      <rect x="-0.30" y="-0.10" width="0.60" height="0.20"/>'
+    </symbol>
+    <symbol id="v" viewBox="-0.50 -0.50 1.00 1.00">
+      <rect x="-0.10" y="-0.30" width="0.20" height="0.60"/>'
+    </symbol>
+    <symbol id="p" viewBox="-0.50 -0.50 1.00 1.00">
+      <rect x="-0.30" y="-0.10" width="0.60" height="0.20"/>'
+      <rect x="-0.10" y="-0.30" width="0.20" height="0.60"/>'
+    </symbol>
+  </defs>
+</svg>

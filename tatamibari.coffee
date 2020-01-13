@@ -2,6 +2,11 @@
 minorWidth = 0.05
 majorWidth = 0.15
 
+symbolMap =
+  '-': 'h'
+  '|': 'v'
+  '+': 'p'
+
 class Puzzle
   constructor: (@nx, @ny, @clues = {}, @solution = {}) ->
 
@@ -36,8 +41,11 @@ class PuzzleDisplay
     @squares = {}
     for x in [0...@puzzle.nx]
       for y in [0...@puzzle.ny]
-        @squares[[x,y]] = group:
-          @squaresGroup.group().translate x, y
+        group = @squaresGroup.group().translate x, y
+        @squares[[x,y]] =
+          group: group
+          use: group.use symbolMap[@puzzle.clues[[x,y]]]
+               .size 1, 1
 
 selected = null
 
@@ -46,11 +54,11 @@ class PuzzleEditor extends PuzzleDisplay
     super()
     for x in [0...@puzzle.nx]
       for y in [0...@puzzle.ny]
+        square = @squares[[x,y]]
+        square.rect = square.group.rect 1, 1
+        .back()
         do (x, y) =>
-          square = @squares[[x,y]]
-          square.rect = square.group.rect 1, 1
           square.group.click click = => @select x, y
-          #@puzzleNumbers[[i,j]].click click
   select: (x, y) ->
     # Selects cell (x,y) in this GUI.  Selection needs to be page-global
     # (because editing is controlled by keyboard and global buttons),
@@ -68,11 +76,52 @@ class PuzzleEditor extends PuzzleDisplay
       y = (y + dy) %% @puzzle.ny
       break #if @puzzle?.cell[x][y] == 0
     @select x, y
+  set: ([x, y], value) ->
+    @puzzle.clues[[x,y]] = value
+    @squares[[x,y]].use.attr 'href', '#' + symbolMap[value]
+
+keyMap =
+  '-': '-'
+  '+': '+'
+  '|': '|'
+  '\\': '|'
+  Delete: null
+  Backspace: null
+
+keyboardInput = ->
+  window.addEventListener 'keyup', (e) ->
+    return unless selected?
+    stop = true
+    if e.key of keyMap
+      selected.set selected.selected, keyMap[e.key]
+    else
+      switch e.key
+        when 'h', 'ArrowLeft'
+          selected.selectMove -1, 0
+        when 'l', 'ArrowRight'
+          selected.selectMove +1, 0
+        when 'j', 'ArrowDown'
+          selected.selectMove 0, +1
+        when 'k', 'ArrowUp'
+          selected.selectMove 0, -1
+        else
+          stop = false
+    if stop
+      e.preventDefault()
+      e.stopPropagation()
+  #for num in [0..9]
+  #  do (num) ->
+  #    document.getElementById("number#{num}")?.addEventListener 'click', (e) ->
+  #      return unless selected?
+  #      e.preventDefault()
+  #      e.stopPropagation()
+  #      selected.set selected.selected, num
 
 designGUI = ->
   designSVG = SVG().addTo '#design'
   resultSVG = SVG().addTo '#result'
   tata = new PuzzleEditor designSVG, new Puzzle 5, 5
+  keyboardInput()
 
 window?.onload = ->
   if document.getElementById 'design'
