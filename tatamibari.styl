@@ -8,8 +8,10 @@ svg .grid line
     stroke-width: 0.15
     stroke: black
 
-svg .squares rect
-  fill: white
-  cursor: pointer
-  &.selected
+svg .squares
+  g
+    cursor: pointer
+  rect
+    fill: white
+  g.selected rect
     fill: hsl(50,100%,50%) // based on #ffda00 from NYTimes

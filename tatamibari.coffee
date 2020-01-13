@@ -32,19 +32,24 @@ class PuzzleDisplay
       height: @puzzle.ny + majorWidth
 
   drawSquares: ->
+    @squaresGroup.clear()
+    @squares = {}
+    for x in [0...@puzzle.nx]
+      for y in [0...@puzzle.ny]
+        @squares[[x,y]] = group:
+          @squaresGroup.group().translate x, y
 
 selected = null
 
 class PuzzleEditor extends PuzzleDisplay
   drawSquares: ->
-    @squaresGroup.clear()
-    @squares = {}
+    super()
     for x in [0...@puzzle.nx]
       for y in [0...@puzzle.ny]
         do (x, y) =>
-          @squares[[x,y]] = square = @squaresGroup.rect 1, 1
-          .move x, y
-          .click click = => @select x, y
+          square = @squares[[x,y]]
+          square.rect = square.group.rect 1, 1
+          square.group.click click = => @select x, y
           #@puzzleNumbers[[i,j]].click click
   select: (x, y) ->
     # Selects cell (x,y) in this GUI.  Selection needs to be page-global
@@ -52,7 +57,7 @@ class PuzzleEditor extends PuzzleDisplay
     # so we need to deselect everything in all GUIs.
     for element in document.getElementsByClassName 'selected'
       element.classList.remove 'selected'
-    @squares[[x,y]].addClass 'selected'
+    @squares[[x,y]].group.addClass 'selected'
     @selected = [x, y]
     selected = @
   selectMove: (dx, dy) ->
