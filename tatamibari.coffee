@@ -11,20 +11,31 @@ symbolMap =
 
 class Puzzle
   constructor: (@nx, @ny, @clues = {}, @color = {}, @edges = {}) ->
-  asciiClues: ->
-    (for y in [0...@ny]
-      (for x in [0...@nx]
-        @clues[[x,y]] or '.'
-      ).join ''
-    ).join '\n'
-  @asciiCluesLoad: (ascii) ->
-    lines = ascii.split '\n'
+  toAscii: ->
+    color = []
+    clues:
+      (for y in [0...@ny]
+        (for x in [0...@nx]
+          if @clues[[x,y]]?
+            color.push @color[[x,y]] ? 0
+          @clues[[x,y]] ? '.'
+        ).join ''
+      ).join '\n'
+    color: color.join ''
+  @fromAscii: (clueString, colorString) ->
+    lines = clueString.split '\n'
     clues = {}
+    color = {}
+    count = 0
     for line, y in lines
       for char, x in line
         if char != '.'
           clues[[x,y]] = char
-    new @ (Math.max ...(line.length for line in lines)), lines.length, clues
+          if colorString?
+            color[[x,y]] = colorString[count++]
+          else
+            color[[x,y]] = 1 # default for old format
+    new @ (Math.max ...(line.length for line in lines)), lines.length, clues, color
   symbolId: (xy) ->
     if symbolMap[@clues[xy]]?
       symbolMap[@clues[xy]] + (@color[xy] ? 0)
@@ -149,8 +160,11 @@ class PuzzleEditor extends PuzzlePlayer
     @squares[xy].use.attr 'href', '#' + @puzzle.symbolId xy
     @pushState() if @puzzle.clues[xy]?
   pushState: ->
+    ascii = puzzle.toAscii()
     history.pushState null, 'tatamibari',
-      "#{document.location.pathname}?puzzle=#{encodeURIComponent puzzle.asciiClues()}"
+      "#{document.location.pathname}" +
+      "?puzzle=#{encodeURIComponent ascii.clues}" +
+      "&color=#{encodeURIComponent ascii.color}"
 
 keyMap =
   '-': '-'
@@ -219,7 +233,7 @@ solve = ->
   document.getElementById 'result'
   .innerHTML = ''
   maxSolutions = parseInt document.getElementById('solutions').value
-  url = "#{server}?puzzle=#{encodeURIComponent puzzle.asciiClues()}" + (
+  url = "#{server}?puzzle=#{encodeURIComponent puzzle.toAscii().clues}" + (
     for id in ['solutions', 'clues', 'cover', 'corners']
       "&#{id}=#{document.getElementById(id).value}"
   ).join('') +
@@ -281,7 +295,7 @@ showSolution = (which) ->
         edges[[x,y+0.5]] = true
       if y > 0 and numbers[[x,y-1]] != numbers[[x,y]]
         edges[[x+0.5,y]] = true
-  solPuzzle = new Puzzle puzzle.nx, puzzle.ny, clues, edges
+  solPuzzle = new Puzzle puzzle.nx, puzzle.ny, clues, puzzle.color, edges
   resultSVG = SVG().addTo '#result'
   new PuzzleDisplay resultSVG, solPuzzle
 
@@ -306,9 +320,10 @@ designGUI = ->
   resizer()
 
   window.addEventListener 'popstate', load = ->
-    if data = getParameterByName 'puzzle'
+    if clues = getParameterByName 'puzzle'
       designSVG.clear()
-      new PuzzleEditor designSVG, puzzle = Puzzle.asciiCluesLoad data
+      new PuzzleEditor designSVG, puzzle = Puzzle.fromAscii clues,
+        getParameterByName 'color'
   load()
 
   document.getElementById 'reset'
