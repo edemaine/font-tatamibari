@@ -26,13 +26,24 @@ svg .grid line
 
 svg .edges line
   stroke-width: 0.15
-  stroke: black
+  stroke: rgba(0,0,0,0)
   stroke-linecap: square
+
+  &.on
+    stroke: black
+
+svg .edges.play line
+  cursor: pointer
+
+  &:hover
+    stroke: #888
 
 svg .squares
   g
     cursor: pointer
   rect
     fill: white
+  g:hover rect
+    fill: hsl(50,100%,80%)
   g.selected rect
     fill: hsl(50,100%,50%) // based on #ffda00 from NYTimes

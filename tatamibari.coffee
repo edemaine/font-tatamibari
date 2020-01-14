@@ -27,7 +27,6 @@ class Puzzle
     new @ (Math.max ...(line.length for line in lines)), lines.length, clues
 
 class PuzzleDisplay
-  drawAllEdges: false
   constructor: (@svg, @puzzle) ->
     @squaresGroup = @svg.group()
     .addClass 'squares'
@@ -74,11 +73,26 @@ class PuzzleDisplay
       x = parseFloat x
       y = parseFloat y
       @edgesGroup.line Math.floor(x), Math.floor(y), Math.ceil(x), Math.ceil(y)
+      .addClass 'on'
+
+class PuzzlePlayer extends PuzzleDisplay
+  constructor: (...args) ->
+    super ...args
+    @edgesGroup.addClass 'play'
+  drawEdges: ->
+    @edgesGroup.clear()
+    for x in [0...@puzzle.nx]
+      for y in [0...@puzzle.ny]
+        if y > 0
+          l = @edgesGroup.line x, y, x+1, y
+          l.addClass 'on' if @puzzle.edges[[x+0.5,y]]
+        if x > 0
+          l = @edgesGroup.line x, y, x, y+1
+          l.addClass 'on' #if @puzzle.edges[[x,y+0.5]]
 
 selected = null
 
-class PuzzleEditor extends PuzzleDisplay
-  drawAllEdges: true
+class PuzzleEditor extends PuzzlePlayer
   drawSquares: ->
     super()
     for x in [0...@puzzle.nx]
