@@ -88,9 +88,6 @@ class PuzzleDisplay
           .center x, y
 
 class PuzzlePlayer extends PuzzleDisplay
-  constructor: (...args) ->
-    super ...args
-    @edgesGroup.addClass 'play'
   drawEdges: ->
     @edgesGroup.clear()
     for xi in [0...@puzzle.nx]
@@ -98,8 +95,10 @@ class PuzzlePlayer extends PuzzleDisplay
         for [x, y] in [[xi+0.5, yi], [xi, yi+0.5]] when x > 0 and y > 0
           l = @edgesGroup.line Math.floor(x), Math.floor(y), Math.ceil(x), Math.ceil(y)
           l.addClass 'on' if @puzzle.edges[[x,y]]
+          t = @edgesGroup.line Math.floor(x), Math.floor(y), Math.ceil(x), Math.ceil(y)
+          .addClass 'toggle'
           do (l, x, y) =>
-            l.click =>
+            t.click =>
               @puzzle.edges[[x,y]] = not @puzzle.edges[[x,y]]
               if @puzzle.edges[[x,y]]
                 l.addClass 'on'

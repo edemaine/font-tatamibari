@@ -27,16 +27,17 @@ svg .grid line
 svg .edges line
   stroke-width: 0.15
   stroke: rgba(0,0,0,0)
-  stroke-linecap: square
 
   &.on
     stroke: black
+    stroke-linecap: square
 
-svg .edges.play line
-  cursor: pointer
+  &.toggle
+    cursor: pointer
+    stroke-width: 0.4
 
-  &:hover
-    stroke: #888
+    &:hover
+      stroke: hsla(50,100%,50%,0.5) // rgba(0,0,0,0.5)
 
 svg .squares
   g
