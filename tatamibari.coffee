@@ -10,7 +10,7 @@ symbolMap =
   '+': 'p'
 
 class Puzzle
-  constructor: (@nx, @ny, @clues = {}, @edges = {}) ->
+  constructor: (@nx, @ny, @clues = {}, @color = {}, @edges = {}) ->
   asciiClues: ->
     (for y in [0...@ny]
       (for x in [0...@nx]
@@ -25,6 +25,11 @@ class Puzzle
         if char != '.'
           clues[[x,y]] = char
     new @ (Math.max ...(line.length for line in lines)), lines.length, clues
+  symbolId: (xy) ->
+    if symbolMap[@clues[xy]]?
+      symbolMap[@clues[xy]] + (@color[xy] ? 0)
+    else
+      undefined
 
 class PuzzleDisplay
   constructor: (@svg, @puzzle) ->
@@ -66,7 +71,7 @@ class PuzzleDisplay
         group = @squaresGroup.group().translate x, y
         @squares[[x,y]] =
           group: group
-          use: group.use symbolMap[@puzzle.clues[[x,y]]]
+          use: group.use @puzzle.symbolId [x,y]
                .size 1, 1
 
   drawEdges: ->
@@ -135,10 +140,14 @@ class PuzzleEditor extends PuzzlePlayer
       y = (y + dy) %% @puzzle.ny
       break #if @puzzle?.cell[x][y] == 0
     @select x, y
-  set: ([x, y], value) ->
-    @puzzle.clues[[x,y]] = value
-    @squares[[x,y]].use.attr 'href', '#' + symbolMap[value]
+  set: (xy, value) ->
+    @puzzle.clues[xy] = value
+    @squares[xy].use.attr 'href', '#' + @puzzle.symbolId xy
     @pushState()
+  toggleColor: (xy = @selected) ->
+    @puzzle.color[xy] = 1 - (@puzzle.color[xy] ? 0)
+    @squares[xy].use.attr 'href', '#' + @puzzle.symbolId xy
+    @pushState() if @puzzle.clues[xy]?
   pushState: ->
     history.pushState null, 'tatamibari',
       "#{document.location.pathname}?puzzle=#{encodeURIComponent puzzle.asciiClues()}"
@@ -170,6 +179,8 @@ keyboardInput = ->
           selected.selectMove 0, +1
         when 'k', 'ArrowUp'
           selected.selectMove 0, -1
+        when 'c', 'C'
+          selected.toggleColor()
         else
           stop = false
     if stop
@@ -187,6 +198,12 @@ keyboardInput = ->
         e.preventDefault()
         e.stopPropagation()
         selected.set selected.selected, value
+  document.getElementById "button-color"
+  ?.addEventListener 'click', (e) ->
+    return unless selected?
+    e.preventDefault()
+    e.stopPropagation()
+    selected.toggleColor()
 
 puzzle = null
 solutions = null

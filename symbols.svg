@@ -1,14 +1,24 @@
 <svg id="symbols" width="0" height="0">
   <defs>
-    <symbol id="h" viewBox="-0.50 -0.50 1.00 1.00">
-      <rect x="-0.30" y="-0.10" width="0.60" height="0.20"/>'
+    <symbol id="h1" viewBox="-0.50 -0.50 1.00 1.00">
+      <rect x="-0.30" y="-0.10" width="0.60" height="0.20"/>
     </symbol>
-    <symbol id="v" viewBox="-0.50 -0.50 1.00 1.00">
-      <rect x="-0.10" y="-0.30" width="0.20" height="0.60"/>'
+    <symbol id="v1" viewBox="-0.50 -0.50 1.00 1.00">
+      <rect x="-0.10" y="-0.30" width="0.20" height="0.60"/>
     </symbol>
-    <symbol id="p" viewBox="-0.50 -0.50 1.00 1.00">
-      <rect x="-0.30" y="-0.10" width="0.60" height="0.20"/>'
-      <rect x="-0.10" y="-0.30" width="0.20" height="0.60"/>'
+    <symbol id="p1" viewBox="-0.50 -0.50 1.00 1.00">
+      <rect x="-0.30" y="-0.10" width="0.60" height="0.20"/>
+      <rect x="-0.10" y="-0.30" width="0.20" height="0.60"/>
+    </symbol>
+
+    <symbol id="h0" viewBox="-0.50 -0.50 1.00 1.00">
+      <rect x="-0.275" y="-0.075" width="0.55" height="0.15" fill="white" stroke="black" stroke-width="0.075"/>
+    </symbol>
+    <symbol id="v0" viewBox="-0.50 -0.50 1.00 1.00">
+      <rect x="-0.075" y="-0.275" width="0.15" height="0.55" fill="white" stroke="black" stroke-width="0.075"/>
+    </symbol>
+    <symbol id="p0" viewBox="-0.50 -0.50 1.00 1.00">
+      <path d="M -0.275 -0.075 H -0.075 V -0.275 H 0.075 V -0.075 H 0.275 V 0.075 H 0.075 V 0.275 H -0.075 V 0.075 H -0.275 Z" fill="white" stroke="black" stroke-width="0.075"/>
     </symbol>
   </defs>
 </svg>
