@@ -1,12 +1,24 @@
 html
   head
     title Tatamibari Designer
+    meta(name="viewport", content="width=device-width, initial-scale=1, user-scalable=no")
     script(type="text/javascript", src="node_modules/@svgdotjs/svg.js/dist/svg.min.js")
     script(type="text/javascript", src="tatamibari.js")
     style
       include:stylus tatamibari.styl
   body
-    table
+    #buttons
+      #button-p
+        svg(viewBox="0 0 1 1")
+          use(href="#p")
+      #button-h
+        svg(viewBox="0 0 1 1")
+          use(href="#h")
+      #button-v
+        svg(viewBox="0 0 1 1")
+          use(href="#v")
+      #button-erase erase
+    table#header
       tr
         td(style="text-align: left; vertical-align: middle")
           h1 Tatamibari Designer

@@ -175,13 +175,18 @@ keyboardInput = ->
     if stop
       e.preventDefault()
       e.stopPropagation()
-  #for num in [0..9]
-  #  do (num) ->
-  #    document.getElementById("number#{num}")?.addEventListener 'click', (e) ->
-  #      return unless selected?
-  #      e.preventDefault()
-  #      e.stopPropagation()
-  #      selected.set selected.selected, num
+
+  for button in ['p', 'h', 'v', 'erase']
+    value = null
+    for symbol, char of symbolMap when char == button
+      value = symbol
+    do (value) ->
+      document.getElementById "button-#{button}"
+      ?.addEventListener 'click', (e) ->
+        return unless selected?
+        e.preventDefault()
+        e.stopPropagation()
+        selected.set selected.selected, value
 
 puzzle = null
 solutions = null
@@ -267,6 +272,7 @@ designGUI = ->
   designSVG = SVG().addTo '#design'
   new PuzzleEditor designSVG, puzzle = new Puzzle 10, 10
   keyboardInput()
+
   document.getElementById 'solve'
   .addEventListener 'click', solve
   document.getElementById 'solPrev'
@@ -275,6 +281,7 @@ designGUI = ->
   document.getElementById 'solNext'
   .addEventListener 'click', ->
     showSolution solWhich + 1
+
   window.addEventListener 'resize', resizer = ->
     resize 'design'
     document.getElementById('result').style.height =

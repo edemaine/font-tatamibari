@@ -6,6 +6,8 @@ svg
 #symbols
   width: 0px
   height: 0px
+#header
+  margin-top: 20px
 
 .input
   display: inline-block
@@ -52,3 +54,29 @@ svg .squares
 svg .errors
   circle
     fill: red
+
+#buttons
+  position: fixed
+  top: 0
+  left: 0
+  right: 0
+  text-align: center
+  user-select: none
+
+  div
+    display: inline-block
+    border: solid;
+    width: 25px
+    height: 25px
+    padding: 2px
+    text-align: center
+    font-weight: 700
+    font-size: 20px
+    background: #ddd
+    cursor: pointer
+    vertical-align: top
+
+    &:hover { background: hsl(50,100%,80%); }
+
+  #button-erase
+    width: auto
