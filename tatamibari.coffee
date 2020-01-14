@@ -314,7 +314,7 @@ getParameterByName = (name) ->
 
 resize = (id) ->
   offset = document.getElementById(id).getBoundingClientRect()
-  height = Math.max 100, window.innerHeight - offset.top
+  height = Math.max 250, window.innerHeight - offset.top
   document.getElementById(id).style.height = "#{height}px"
 
 window?.onload = ->
