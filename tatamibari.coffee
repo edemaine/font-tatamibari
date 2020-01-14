@@ -123,6 +123,7 @@ class PuzzlePlayer extends PuzzleDisplay
               @drawErrors()
 
 selected = null
+currentColor = 1
 
 class PuzzleEditor extends PuzzlePlayer
   drawSquares: ->
@@ -153,10 +154,11 @@ class PuzzleEditor extends PuzzlePlayer
     @select x, y
   set: (xy, value) ->
     @puzzle.clues[xy] = value
+    @puzzle.color[xy] = currentColor
     @squares[xy].use.attr 'href', '#' + @puzzle.symbolId xy
     @pushState()
   toggleColor: (xy = @selected) ->
-    @puzzle.color[xy] = 1 - (@puzzle.color[xy] ? 0)
+    currentColor = @puzzle.color[xy] = 1 - (@puzzle.color[xy] ? 0)
     @squares[xy].use.attr 'href', '#' + @puzzle.symbolId xy
     @pushState() if @puzzle.clues[xy]?
   pushState: ->
