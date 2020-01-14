@@ -34,9 +34,12 @@ class PuzzleDisplay
     .addClass 'grid'
     @edgesGroup = @svg.group()
     .addClass 'edges'
+    @errorsGroup = @svg.group()
+    .addClass 'errors'
     @drawGrid()
     @drawSquares()
     @drawEdges()
+    @drawErrors()
 
   drawGrid: ->
     @gridGroup.clear()
@@ -75,6 +78,15 @@ class PuzzleDisplay
       @edgesGroup.line Math.floor(x), Math.floor(y), Math.ceil(x), Math.ceil(y)
       .addClass 'on'
 
+  drawErrors: ->
+    @errorsGroup.clear()
+    for x in [1...@puzzle.nx]
+      for y in [1...@puzzle.ny]
+        if @puzzle.edges[[x-0.5,y]] and @puzzle.edges[[x,y-0.5]] and
+           @puzzle.edges[[x+0.5,y]] and @puzzle.edges[[x,y+0.5]]
+          @errorsGroup.circle 0.4
+          .center x, y
+
 class PuzzlePlayer extends PuzzleDisplay
   constructor: (...args) ->
     super ...args
@@ -93,6 +105,7 @@ class PuzzlePlayer extends PuzzleDisplay
                 l.addClass 'on'
               else
                 l.removeClass 'on'
+              @drawErrors()
 
 selected = null
 
