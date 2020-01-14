@@ -10,7 +10,7 @@ symbolMap =
   '+': 'p'
 
 class Puzzle
-  constructor: (@nx, @ny, @clues = {}, @solution = {}) ->
+  constructor: (@nx, @ny, @clues = {}, @edges = {}) ->
   asciiClues: ->
     (for y in [0...@ny]
       (for x in [0...@nx]
@@ -27,6 +27,7 @@ class Puzzle
     new @ (Math.max ...(line.length for line in lines)), lines.length, clues
 
 class PuzzleDisplay
+  drawAllEdges: false
   constructor: (@svg, @puzzle) ->
     @squaresGroup = @svg.group()
     .addClass 'squares'
@@ -68,16 +69,16 @@ class PuzzleDisplay
 
   drawEdges: ->
     @edgesGroup.clear()
-    for x in [0...@puzzle.nx]
-      for y in [0...@puzzle.ny]
-        if x > 0 and @puzzle.solution[[x-1,y]] != @puzzle.solution[[x,y]]
-          @edgesGroup.line x, y, x, y+1
-        if y > 0 and @puzzle.solution[[x,y-1]] != @puzzle.solution[[x,y]]
-          @edgesGroup.line x, y, x+1, y
+    for key of @puzzle.edges
+      [x, y] = key.split ','
+      x = parseFloat x
+      y = parseFloat y
+      @edgesGroup.line Math.floor(x), Math.floor(y), Math.ceil(x), Math.ceil(y)
 
 selected = null
 
 class PuzzleEditor extends PuzzleDisplay
+  drawAllEdges: true
   drawSquares: ->
     super()
     for x in [0...@puzzle.nx]
@@ -220,7 +221,14 @@ showSolution = (which) ->
       number = undefined if isNaN number
       numbers[[x,y]] = number
       clues[[x,y]] = match[2]
-  solPuzzle = new Puzzle puzzle.nx, puzzle.ny, clues, numbers
+  edges = {}
+  for x in [0...puzzle.nx]
+    for y in [0...puzzle.ny]
+      if x > 0 and numbers[[x-1,y]] != numbers[[x,y]]
+        edges[[x,y+0.5]] = true
+      if y > 0 and numbers[[x,y-1]] != numbers[[x,y]]
+        edges[[x+0.5,y]] = true
+  solPuzzle = new Puzzle puzzle.nx, puzzle.ny, clues, edges
   resultSVG = SVG().addTo '#result'
   new PuzzleDisplay resultSVG, solPuzzle
 
