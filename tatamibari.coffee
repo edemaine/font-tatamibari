@@ -150,6 +150,7 @@ keyMap =
   '+': '+'
   '\\': '|'
   '|': '|'
+  ' ': null
   Delete: null
   Backspace: null
 
