@@ -81,14 +81,18 @@ class PuzzlePlayer extends PuzzleDisplay
     @edgesGroup.addClass 'play'
   drawEdges: ->
     @edgesGroup.clear()
-    for x in [0...@puzzle.nx]
-      for y in [0...@puzzle.ny]
-        if y > 0
-          l = @edgesGroup.line x, y, x+1, y
-          l.addClass 'on' if @puzzle.edges[[x+0.5,y]]
-        if x > 0
-          l = @edgesGroup.line x, y, x, y+1
-          l.addClass 'on' #if @puzzle.edges[[x,y+0.5]]
+    for xi in [0...@puzzle.nx]
+      for yi in [0...@puzzle.ny]
+        for [x, y] in [[xi+0.5, yi], [xi, yi+0.5]] when x > 0 and y > 0
+          l = @edgesGroup.line Math.floor(x), Math.floor(y), Math.ceil(x), Math.ceil(y)
+          l.addClass 'on' if @puzzle.edges[[x,y]]
+          do (l, x, y) =>
+            l.click =>
+              @puzzle.edges[[x,y]] = not @puzzle.edges[[x,y]]
+              if @puzzle.edges[[x,y]]
+                l.addClass 'on'
+              else
+                l.removeClass 'on'
 
 selected = null
 
