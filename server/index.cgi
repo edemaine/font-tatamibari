@@ -31,7 +31,7 @@ try:
   settings['clue_constraints'] = data.getfirst('clues', 'hard')
   assert settings['clue_constraints'] in ['hard', 'ignore']
   settings['cover_constraints'] = data.getfirst('covers', 'exact')
-  assert settings['cover_constraints'] in ['exact', 'subset', 'superset', 'incomparable', 'ignore']
+  assert settings['cover_constraints'] in ['exact', 'subset', 'superset', 'incomparable']#, 'ignore']
   settings['corner_constraints'] = data.getfirst('corners', 'hard')
   assert settings['corner_constraints'] in ['hard', 'soft', 'ignore']
   settings['reflex_three_corners'] = bool(int(data.getfirst('reflex', '0')))

@@ -240,7 +240,7 @@ solve = ->
   .innerHTML = ''
   maxSolutions = parseInt document.getElementById('solutions').value
   url = "#{server}?puzzle=#{encodeURIComponent puzzle.toAscii().clues}" + (
-    for id in ['solutions', 'clues', 'cover', 'corners']
+    for id in ['solutions', 'clues', 'covers', 'corners']
       "&#{id}=#{document.getElementById(id).value}"
   ).join('') +
   "&reflex=#{if document.getElementById('reflex').checked then 1 else 0}"
