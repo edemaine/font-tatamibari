@@ -82,6 +82,7 @@ class PuzzleDisplay
         group = @squaresGroup.group().translate x, y
         @squares[[x,y]] =
           group: group
+          rect: group.rect 1, 1
           use: group.use @puzzle.symbolId [x,y]
                .size 1, 1
 
@@ -102,6 +103,11 @@ class PuzzleDisplay
            @puzzle.edges[[x+0.5,y]] and @puzzle.edges[[x,y+0.5]]
           @errorsGroup.circle 0.4
           .center x, y
+
+  showSolved: ->
+    for x in [0...@puzzle.nx]
+      for y in [0...@puzzle.ny]
+        @squares[[x,y]].group.attr 'class', "s#{@puzzle.color[[x,y]]}"
 
 class PuzzlePlayer extends PuzzleDisplay
   drawEdges: ->
@@ -128,13 +134,11 @@ currentColor = 1
 class PuzzleEditor extends PuzzlePlayer
   drawSquares: ->
     super()
+    @squaresGroup.addClass 'toggle'
     for x in [0...@puzzle.nx]
       for y in [0...@puzzle.ny]
-        square = @squares[[x,y]]
-        square.rect = square.group.rect 1, 1
-        .back()
         do (x, y) =>
-          square.group.click click = => @select x, y
+          @squares[[x,y]].group.click => @select x, y
   select: (x, y) ->
     # Selects cell (x,y) in this GUI.  Selection needs to be page-global
     # (because editing is controlled by keyboard and global buttons),
@@ -272,6 +276,17 @@ solve = ->
       .innerHTML = solutions.length + '!'
   xhr.send()
 
+# Fake server for testing.
+###
+solve = ->
+  solutions = [
+    for y in [0...puzzle.ny]
+      for x in [0...puzzle.nx]
+        '5' + if x == y == 2 then '+' else ''
+  ]
+  showSolution 0
+###
+
 showSolution = (which) ->
   return unless 0 <= which < solutions.length
   solWhich = which
@@ -297,9 +312,17 @@ showSolution = (which) ->
         edges[[x,y+0.5]] = true
       if y > 0 and numbers[[x,y-1]] != numbers[[x,y]]
         edges[[x+0.5,y]] = true
-  solPuzzle = new Puzzle puzzle.nx, puzzle.ny, clues, puzzle.color, edges
+  colorMap = {}
+  for xy, value of puzzle.clues when value?
+    colorMap[numbers[xy]] = puzzle.color[xy]
+  color = {}
+  for x in [0...puzzle.nx]
+    for y in [0...puzzle.ny]
+      color[[x,y]] = colorMap[numbers[[x,y]]]
+  solPuzzle = new Puzzle puzzle.nx, puzzle.ny, clues, color, edges
   resultSVG = SVG().addTo '#result'
   new PuzzleDisplay resultSVG, solPuzzle
+  .showSolved()
 
 designGUI = ->
   designSVG = SVG().addTo '#design'
