@@ -68,6 +68,8 @@ html
       tr
         th Puzzle
           span(style="font-weight: normal")  (edges are just for guidelines)
+          button#puzDownload SVG
+          a#download(style="display: none")
         th
           | Solution 
           span#solWhich ?
@@ -75,6 +77,7 @@ html
           span#solCount ?
           button#solPrev prev
           button#solNext next
+          button#solDownload SVG
       tr
         td(style="width: 50%")
           #design.root

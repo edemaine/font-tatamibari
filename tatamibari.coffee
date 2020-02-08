@@ -287,6 +287,8 @@ solve = ->
   showSolution 0
 ###
 
+resultSVG = null
+
 showSolution = (which) ->
   return unless 0 <= which < solutions.length
   solWhich = which
@@ -324,6 +326,54 @@ showSolution = (which) ->
   new PuzzleDisplay resultSVG, solPuzzle
   .showSolved()
 
+svgPrefixId = (svg, prefix = 'N') ->
+  svg.replace /\b(id\s*=\s*")([^"]*")/gi, "$1#{prefix}$2"
+  .replace /\b(xlink:href\s*=\s*"#)([^"]*")/gi, "$1#{prefix}$2"
+
+svgExplicit = (svg) ->
+  explicit = SVG().addTo '#gui'
+  try
+    explicit.svg svgPrefixId svg.svg(), ''
+    ## Expand CSS for <rect>, <line>, <circle>
+    explicit.find 'rect, line, circle'
+    .each ->
+      style = window.getComputedStyle @node
+      @css 'fill', style.fill
+      @css 'stroke', style.stroke
+      @css 'stroke-width', style.strokeWidth
+      @css 'stroke-linecap', style.strokeLinecap
+      @remove() if style.visibility == 'hidden'
+    ## Expand <use> into duplicate copies with translation
+    explicit.find 'use'
+    .each ->
+      replacement = document.getElementById @attr('xlink:href').replace /^#/, ''
+      unless replacement?  # reference to non-existing object
+        return @remove()
+      replacement = SVG replacement
+      viewbox = replacement.attr('viewBox') ? ''
+      viewbox = viewbox.split /\s+/
+      viewbox = (parseFloat n for n in viewbox)
+      replacement = svgPrefixId replacement.svg()
+      replacement = replacement.replace /<symbol\b/, '<g'
+      replacement = explicit.group().svg replacement
+      ## First transform according to `transform`, then translate by `x`, `y`
+      #replacement.transform @transform()
+      replacement.translate \
+        (@attr('x') or 0) - (viewbox[0] or 0),
+        (@attr('y') or 0) - (viewbox[1] or 0)
+      #replacement.translate (@attr('x') or 0), (@attr('y') or 0)
+      replacement.attr 'viewBox', null
+      replacement.attr 'id', null
+      #console.log 'replaced', @attr('xlink:href'), 'with', replacement.svg()
+      @replace replacement
+    ## Delete now-useless <defs>
+    explicit.find 'defs'
+    .each ->
+      @clear()
+    explicit.svg()
+  finally
+    explicit.remove()
+
 designGUI = ->
   designSVG = SVG().addTo '#design'
   new PuzzleEditor designSVG, puzzle = new Puzzle 10, 10
@@ -337,6 +387,16 @@ designGUI = ->
   document.getElementById 'solNext'
   .addEventListener 'click', ->
     showSolution solWhich + 1
+
+  for [type, svg] in [['puz', -> designSVG], ['sol', -> resultSVG]]
+    do (type, svg) ->
+      document.getElementById "#{type}Download"
+      .addEventListener 'click', ->
+        explicit = svgExplicit svg()
+        document.getElementById('download').href = URL.createObjectURL \
+          new Blob [explicit], type: "image/svg+xml"
+        document.getElementById('download').download = "tatamibari-#{type}.svg"
+        document.getElementById('download').click()
 
   window.addEventListener 'resize', resizer = ->
     resize 'design'
