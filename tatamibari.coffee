@@ -371,6 +371,9 @@ svgExplicit = (svg) ->
     .each ->
       @clear()
     explicit.svg()
+    ## Remove surrounding <svg>...</svg> from explicit SVG container
+    .replace /^<svg[^<>]*>/, ''
+    .replace /<\/svg>$/, ''
   finally
     explicit.remove()
 
