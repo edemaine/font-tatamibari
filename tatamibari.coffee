@@ -67,11 +67,15 @@ class Puzzle
       break if count == width
       return null unless count == 0
       yMin--
+      for x in [xMin..xMax] when x not in [0, @nx]
+        return null unless (x in [xMin, xMax]) == Boolean @edges[[x,yMin+0.5]]
     yMax = y+1
     until yMax == @ny
       count = (1 for x in [xMin...xMax] when @edges[[x+0.5,yMax]]).length
       break if count == width
       return null unless count == 0
+      for x in [xMin..xMax] when x not in [0, @nx]
+        return null unless (x in [xMin, xMax]) == Boolean @edges[[x,yMax+0.5]]
       yMax++
     height = yMax - yMin
     ## Rectangle found. Check aspect ratio vs. clue.
@@ -278,14 +282,9 @@ class PuzzlePlayer extends PuzzleDisplay
       @lines[edge] = @edgesGroup.line p..., q...
       .addClass if @puzzle.edges[edge] then 'on' else 'con'
     if solved = @puzzle.checkSolved()
-      unless @wasSolved
-        @rectanglesGroup.opacity 0
-        @rectanglesGroup.animate().opacity 1
+      @svg.addClass 'solved'
     else
-      if @wasSolved
-        @rectanglesGroup.animate().opacity 0
-        .after => @rectanglesGroup.opacity null
-    @wasSolved = solved
+      @svg.removeClass 'solved'
 
     if @linked? and links
       for link in @linked when link != @
