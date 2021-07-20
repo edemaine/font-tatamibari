@@ -20,6 +20,10 @@ html
         .font-solved
           .edges, .errors
             opacity: 0
+        .icon
+          display: inline-block
+          width: auto
+          height: 1em
     //#include virtual="../../analytics.html"
   body
     table.w-100
@@ -59,6 +63,51 @@ html
     hr.noprint
 
     p.noprint.
+      In a Tatamibari puzzle, you are given a grid of unit squares, some of
+      which have a clue icon of
+      <svg class="icon" viewBox="-0.025 -0.025 1.05 1.05"><rect width="1" height="1" fill="white" stroke="#666" stroke-width="0.05"/><use href="#p1"/></svg>,
+      <svg class="icon" height="1.5em" viewBox="-0.025 -0.025 1.05 1.05"><rect width="1" height="1" fill="white" stroke="#666" stroke-width="0.05"/><use href="#h1"/></svg>, or
+      <svg class="icon" height="1.5em" viewBox="-0.025 -0.025 1.05 1.05"><rect width="1" height="1" fill="white" stroke="#666" stroke-width="0.05"/><use href="#v1"/></svg>.
+      The goal is to decompose the grid into <b>rectangles</b>,
+      each containing exactly one clue icon,
+      where rectangles containing
+      <svg class="icon" viewBox="-0.025 -0.025 1.05 1.05"><rect width="1" height="1" fill="white" stroke="#666" stroke-width="0.05"/><use href="#p1"/></svg> are squares,
+      rectangles containing
+      <svg class="icon" height="1.5em" viewBox="-0.025 -0.025 1.05 1.05"><rect width="1" height="1" fill="white" stroke="#666" stroke-width="0.05"/><use href="#h1"/></svg> are wider than they are tall,
+      and rectangles containing
+      <svg class="icon" height="1.5em" viewBox="-0.025 -0.025 1.05 1.05"><rect width="1" height="1" fill="white" stroke="#666" stroke-width="0.05"/><use href="#v1"/></svg> are taller than they are wide.
+      Furthermore, at most three rectangles can meet at any grid intersection.
+
+    p.noprint.
+      <a href="https://en.wikipedia.org/wiki/Tatamibari">Tatamibari (タタミバリ in Japanese)</a>
+      is one of the many pencil-and-paper puzzles designed for the
+      Japanese puzzle magazine and publisher
+      <a href="http://nikoli.co.jp/en/"><i>Nikoli</i></a>,
+      Like most Nikoli puzzles,
+      <a href="https://erikdemaine.org/papers/Tatamibari_FUN2020/">Tatamibari is NP-complete</a>,
+      meaning that there is no efficient algorithm to solve them,
+      assuming P&nbsp;&ne;&nbsp;NP.
+      Unusually, it took 16 years for this puzzle to be proved NP-complete.
+
+    p.noprint.
+      This typeface features 26 uniquely solvable Tatamibari puzzles,
+      one for each letter of the alphabet.
+      The <b>puzzle font</b> shows just the clues.
+      We introduce clues of two different colors, black and white;
+      after solving the puzzle, the corresponding rectangle should be
+      filled the same color.  The black rectangles then form a letter.
+      The <b>solved font</b> illustrates these solutions.
+      See <a href="https://erikdemaine.org/papers/Tatamibari_FUN2020/">our paper</a> for details, including how we designed the typeface.
+
+    p.noprint.
+      In the puzzle font, you can try your hand at solving the puzzles by
+      <b>clicking on grid edges</b> to toggle whether they are edges of a rectangle
+      (<b>black</b>).
+      If you <b>Enable third &ldquo;connected&rdquo; state</b>, then you
+      can click on an edge a second time to make it <b>gray</b> and perpendicular
+      to indicate that the two connected grid squares belong to the same rectangle.
+      The rectangles will fill in when you solve the puzzle.
+      Click <b>Reset all puzzles</b> to start over.
 
     p.noprint.
       Check out <a href="http://erikdemaine.org/fonts/">other mathematical and
