@@ -637,11 +637,11 @@ fontGUI = ->
   app = new FontWebappHTML
     root: '#output'
     sizeSlider: '#size'
-    charWidth: 150
+    charWidth: 225
     charPadding: 5
     charKern: 0
-    lineKern: 15
-    spaceWidth: 75
+    lineKern: 22.5
+    spaceWidth: 112.5
     shouldRender: (changed) ->
       changed.text
     renderChar: (char, state, parent) ->
