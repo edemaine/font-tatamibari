@@ -2,6 +2,8 @@
 minorWidth = 0.05
 majorWidth = 0.15
 
+global?.XMLHttpRequest ?= require('xmlhttprequest').XMLHttpRequest
+
 server = 'http://demaine.csail.mit.edu/tatamibari/'
 
 symbolMap =
@@ -22,6 +24,15 @@ class Puzzle
         ).join ''
       ).join '\n'
     color: color.join ''
+  ###
+  @fromCC: (nx, ny, cc) ->
+    clues = {}
+    color = {}
+    for xy, [clue, col] of cc
+      clues[xy] = clue
+      col[xy] = col
+    new @ nx, ny, clues, color
+  ###
   @fromAscii: (clueString, colorString) ->
     lines = clueString.split '\n'
     clues = {}
@@ -32,7 +43,7 @@ class Puzzle
         if char != '.'
           clues[[x,y]] = char
           if colorString?
-            color[[x,y]] = colorString[count++]
+            color[[x,y]] = parseInt colorString[count++]
           else
             color[[x,y]] = 1 # default for old format
     new @ (Math.max ...(line.length for line in lines)), lines.length, clues, color
@@ -41,6 +52,48 @@ class Puzzle
       symbolMap[@clues[xy]] + (@color[xy] ? 0)
     else
       undefined
+  checkClue: (xy) ->
+    [x, y] = xy.split(',').map (i) -> parseInt i
+    ## Grow rectangle horizontally.
+    xMin = x
+    xMin-- until xMin == 0 or @edges[[xMin, y+0.5]]
+    xMax = x+1
+    xMax++ until xMax == @nx or @edges[[xMax, y+0.5]]
+    width = xMax - xMin
+    ## Grow rectangle vertically, checking for all or nothing edges.
+    yMin = y
+    until yMin == 0
+      count = (1 for x in [xMin...xMax] when @edges[[x+0.5,yMin]]).length
+      break if count == width
+      return null unless count == 0
+      yMin--
+    yMax = y+1
+    until yMax == @ny
+      count = (1 for x in [xMin...xMax] when @edges[[x+0.5,yMax]]).length
+      break if count == width
+      return null unless count == 0
+      yMax++
+    height = yMax - yMin
+    ## Rectangle found. Check aspect ratio vs. clue.
+    clue = @clues[xy]
+    return null unless (
+      (width == height) == (clue == '+') and
+      (width < height) == (clue == '|') and
+      (width > height) == (clue == '-')
+    )
+    ## Correct! Return rectangle for this clue.
+    x: xMin
+    y: yMin
+    w: width
+    h: height
+    c: @color[xy]
+  checkSolved: ->
+    rects = []
+    for xy of @clues
+      rect = @checkClue xy
+      return null unless rect?
+      rects.push rect
+    rects
 
 class PuzzleDisplay
   constructor: (@svg, @puzzle) ->
@@ -74,24 +127,33 @@ class PuzzleDisplay
       width: @puzzle.nx + majorWidth
       height: @puzzle.ny + majorWidth
 
+  drawEmptySquares: false
   drawSquares: ->
     @squaresGroup.clear()
     @squares = {}
-    for x in [0...@puzzle.nx]
-      for y in [0...@puzzle.ny]
+    if @drawEmptySquares
+      for x in [0...@puzzle.nx]
+        for y in [0...@puzzle.ny]
+          group = @squaresGroup.group().translate x, y
+          @squares[[x,y]] =
+            group: group
+            rect: group.rect 1, 1
+            use: group.use @puzzle.symbolId [x,y]
+                 .size 1, 1
+    else
+      for xy of @clues
+        [x, y] = xy.split(',').map (i) -> parseInt i
         group = @squaresGroup.group().translate x, y
-        @squares[[x,y]] =
+        @squares[xy] =
           group: group
           rect: group.rect 1, 1
-          use: group.use @puzzle.symbolId [x,y]
+          use: group.use @puzzle.symbolId xy
                .size 1, 1
 
   drawEdges: ->
     @edgesGroup.clear()
-    for key of @puzzle.edges
-      [x, y] = key.split ','
-      x = parseFloat x
-      y = parseFloat y
+    for xy of @puzzle.edges
+      [x, y] = xy.split(',').map (f) -> parseFloat f
       @edgesGroup.line Math.floor(x), Math.floor(y), Math.ceil(x), Math.ceil(y)
       .addClass 'on'
 
@@ -104,6 +166,8 @@ class PuzzleDisplay
           @errorsGroup.circle 0.4
           .center x, y
 
+class PuzzleSolution extends PuzzleDisplay
+  drawEmptySquares: true
   showSolved: ->
     for x in [0...@puzzle.nx]
       for y in [0...@puzzle.ny]
@@ -132,6 +196,7 @@ selected = null
 currentColor = 1
 
 class PuzzleEditor extends PuzzlePlayer
+  drawEmptySquares: true
   drawSquares: ->
     super()
     @squaresGroup.addClass 'toggle'
@@ -230,50 +295,64 @@ solutions = null
 solWhich = null
 xhr = null
 
-solve = ->
+## API to set the puzzle to be solved via `solve`
+setPuzzle = (puz) -> puzzle = puz
+
+solve = (options = {}) -> new Promise (done) ->
   solutions = []
   solWhich = null
-  for id in ['solCount', 'solWhich']
-    document.getElementById id
-    .innerHTML = '?'
-  document.getElementById 'result'
-  .innerHTML = ''
-  maxSolutions = parseInt document.getElementById('solutions').value
+  if document?
+    for id in ['solCount', 'solWhich']
+      document.getElementById id
+      .innerHTML = '?'
+    document.getElementById 'result'
+    .innerHTML = ''
+    for id in ['solutions', 'clues', 'covers', 'corners']
+      options[id] ?= document.getElementById(id).value
+    options.reflex ?= document.getElementById('reflex').checked
+  else
+    options.solutions ?= 1
+    options.clues ?= 'hard'
+    options.covers ?= 'exact'
+    options.corners ?= 'hard'
+    options.reflex = true
   url = "#{server}?puzzle=#{encodeURIComponent puzzle.toAscii().clues}" + (
     for id in ['solutions', 'clues', 'covers', 'corners']
-      "&#{id}=#{document.getElementById(id).value}"
+      "&#{id}=#{options[id]}"
   ).join('') +
-  "&reflex=#{if document.getElementById('reflex').checked then 1 else 0}"
+  "&reflex=#{if options.reflex then 1 else 0}"
   xhr?.abort()
   xhr = new XMLHttpRequest
   xhr.open 'GET', url
   xhr.onprogress = ->
     solutions =
-      for line in xhr.response.split '\n'
+      for line in xhr.responseText.split '\n'
         try
           json = JSON.parse line
         catch
           continue
         if json.warn?
-          document.getElementById 'result'
+          document?.getElementById 'result'
           .innerHTML += "<p><b>WARNING: #{json.warn}</b></p>"
           continue
         if json.error?
-          document.getElementById 'result'
+          document?.getElementById 'result'
           .innerHTML += "<p><b>ERROR: #{json.error}</b></p>" +
                         "<pre>#{json.traceback}</pre>"
           continue
         json
-    document.getElementById 'solCount'
+    document?.getElementById 'solCount'
     .innerHTML = solutions.length + '?'
     showSolution 0 unless solWhich?
   xhr.onload = ->
-    if solutions.length == maxSolutions
-      document.getElementById 'solCount'
+    xhr.onprogress()
+    if solutions.length == options.solutions
+      document?.getElementById 'solCount'
       .innerHTML = solutions.length + '+'
     else
-      document.getElementById 'solCount'
+      document?.getElementById 'solCount'
       .innerHTML = solutions.length + '!'
+    done solutions.length
   xhr.send()
 
 # Fake server for testing.
@@ -292,9 +371,9 @@ resultSVG = null
 showSolution = (which) ->
   return unless 0 <= which < solutions.length
   solWhich = which
-  document.getElementById 'solWhich'
+  document?.getElementById 'solWhich'
   .innerHTML = which+1
-  document.getElementById 'result'
+  document?.getElementById 'result'
   .innerHTML = ''
   clues = {}
   numbers = {}
@@ -306,7 +385,7 @@ showSolution = (which) ->
       number = parseInt match[1]
       number = undefined if isNaN number
       numbers[[x,y]] = number
-      clues[[x,y]] = match[2]
+      clues[[x,y]] = match[2] if match[2]
   edges = {}
   for x in [0...puzzle.nx]
     for y in [0...puzzle.ny]
@@ -322,9 +401,11 @@ showSolution = (which) ->
     for y in [0...puzzle.ny]
       color[[x,y]] = colorMap[numbers[[x,y]]]
   solPuzzle = new Puzzle puzzle.nx, puzzle.ny, clues, color, edges
-  resultSVG = SVG().addTo '#result'
-  new PuzzleDisplay resultSVG, solPuzzle
-  .showSolved()
+  if SVG?
+    resultSVG = SVG().addTo '#result'
+    new PuzzleSolution resultSVG, solPuzzle
+    .showSolved()
+  solPuzzle
 
 svgPrefixId = (svg, prefix = 'N') ->
   svg.replace /\b(id\s*=\s*")([^"]*")/gi, "$1#{prefix}$2"
@@ -440,3 +521,5 @@ resize = (id) ->
 window?.onload = ->
   if document.getElementById 'design'
     designGUI()
+
+module?.exports = {Puzzle, setPuzzle, solve, showSolution}
