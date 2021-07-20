@@ -1,4 +1,4 @@
-# These widths must match the widths in design.pug
+# These widths must match the widths in tatamibari.styl
 minorWidth = 0.05
 majorWidth = 0.15
 
@@ -12,7 +12,7 @@ symbolMap =
   '+': 'p'
 
 class Puzzle
-  constructor: (@nx, @ny, @clues = {}, @color = {}, @edges = {}) ->
+  constructor: (@nx, @ny, @clues = {}, @color = {}, @edges = {}, @rectangles) ->
   toAscii: ->
     color = []
     clues:
@@ -97,14 +97,21 @@ class Puzzle
 
 class PuzzleDisplay
   constructor: (@svg, @puzzle) ->
-    @squaresGroup = @svg.group()
-    .addClass 'squares'
+    @background = @svg.rect @puzzle.nx, @puzzle.ny
+    .addClass 'background'
+    @rectanglesGroup = @svg.group()
+    .addClass 'rectangles'
     @gridGroup = @svg.group()
     .addClass 'grid'
+    @squaresGroup = @svg.group()
+    .addClass 'squares'
+    @rectEdgesGroup = @svg.group()
+    .addClass 'rectEdges'
     @edgesGroup = @svg.group()
     .addClass 'edges'
     @errorsGroup = @svg.group()
     .addClass 'errors'
+    @drawRectangles()
     @drawGrid()
     @drawSquares()
     @drawEdges()
@@ -112,15 +119,13 @@ class PuzzleDisplay
 
   drawGrid: ->
     @gridGroup.clear()
+    @background.size @puzzle.nx, @puzzle.ny
     for x in [1...@puzzle.nx]
       @gridGroup.line x, 0, x, @puzzle.ny
     for y in [1...@puzzle.ny]
       @gridGroup.line 0, y, @puzzle.nx, y
-    for i in [0, 1] # put border on top
-      @gridGroup.line i*@puzzle.nx, 0, i*@puzzle.nx, @puzzle.ny
-      .addClass 'border'
-      @gridGroup.line 0, i*@puzzle.ny, @puzzle.nx, i*@puzzle.ny
-      .addClass 'border'
+    @gridGroup.rect @puzzle.nx, @puzzle.ny
+    .addClass 'border'
     @svg.viewbox
       x: 0 - majorWidth/2
       y: 0 - majorWidth/2
@@ -137,16 +142,16 @@ class PuzzleDisplay
           group = @squaresGroup.group().translate x, y
           @squares[[x,y]] =
             group: group
-            rect: group.rect 1, 1
+            rect: group.rect 1 - majorWidth, 1 - majorWidth
+                  .move 0.5*majorWidth, 0.5*majorWidth
             use: group.use @puzzle.symbolId [x,y]
                  .size 1, 1
     else
-      for xy of @clues
+      for xy of @puzzle.clues
         [x, y] = xy.split(',').map (i) -> parseInt i
         group = @squaresGroup.group().translate x, y
         @squares[xy] =
           group: group
-          rect: group.rect 1, 1
           use: group.use @puzzle.symbolId xy
                .size 1, 1
 
@@ -157,8 +162,18 @@ class PuzzleDisplay
       @edgesGroup.line Math.floor(x), Math.floor(y), Math.ceil(x), Math.ceil(y)
       .addClass 'on'
 
+  drawRectangles: ->
+    @rectanglesGroup.clear()
+    for rect in @puzzle.rectangles ? []
+      @rectanglesGroup.rect rect.w, rect.h
+      .move rect.x, rect.y
+      .addClass "r#{rect.c}"
+      @rectEdgesGroup.rect rect.w, rect.h
+      .move rect.x, rect.y
+
   drawErrors: ->
     @errorsGroup.clear()
+    return unless (key for key of @puzzle.edges).length
     for x in [1...@puzzle.nx]
       for y in [1...@puzzle.ny]
         if @puzzle.edges[[x-0.5,y]] and @puzzle.edges[[x,y-0.5]] and
@@ -518,8 +533,34 @@ resize = (id) ->
   height = Math.max 250, window.innerHeight - offset.top
   document.getElementById(id).style.height = "#{height}px"
 
+fontGUI = ->
+  app = new FontWebappHTML
+    root: '#output'
+    sizeSlider: '#size'
+    charWidth: 150
+    charPadding: 5
+    charKern: 0
+    lineKern: 15
+    spaceWidth: 75
+    shouldRender: (changed) ->
+      changed.text
+    renderChar: (char, state, parent) ->
+      char = char.toUpperCase()
+      letter = window.font[char]
+      return unless letter?
+      {nx, ny, clues, color, rectangles} = letter
+      svg = SVG().addTo parent
+      box = new PuzzlePlayer svg, new Puzzle nx, ny, clues, color, {}, rectangles
+    linkIdenticalChars: (glyphs) ->
+      glyph.linked = glyphs for glyph in glyphs
+
+  document.getElementById('reset').addEventListener 'click', ->
+    app.render()
+
 window?.onload = ->
   if document.getElementById 'design'
     designGUI()
+  else if document.getElementById 'output'
+    fontGUI()
 
 module?.exports = {Puzzle, setPuzzle, solve, showSolution}

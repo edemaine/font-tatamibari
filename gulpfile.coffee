@@ -1,40 +1,29 @@
-# Source: https://github.com/edemaine/webapp-coffee-pug-stylus
-# Installation:
-# * Update the included package.json and npm install, or install manually:
-#   npm install --save-dev gulp gulp-chmod gulp-coffee gulp-pug gulp-stylus
-# Usage:
-# * npx gulp (compile everything once)
-# * npx gulp watch (automatically compile everything as it changes)
-
 gulp = require 'gulp'
 gulpCoffee = require 'gulp-coffee'
-gulpChmod = require 'gulp-chmod'
 gulpPug = require 'gulp-pug'
-#gulpStylus = require 'gulp-stylus'
+gulpChmod = require 'gulp-chmod'
 
-exports.coffee = coffee = ->
-  gulp.src '*.coffee', ignore: 'gulpfile.coffee'
-  .pipe gulpCoffee()
-  .pipe gulpChmod 0o644
-  .pipe gulp.dest './'
-
+## npm run pug / npx gulp pug: builds index.html from index.pug etc.
 exports.pug = pug = ->
   gulp.src '*.pug'
   .pipe gulpPug pretty: true
   .pipe gulpChmod 0o644
   .pipe gulp.dest './'
 
-#exports.stylus = stylus = ->
-#  gulp.src '*.styl'
-#  .pipe gulpStylus pretty: true
-#  .pipe gulpChmod 0o644
-#  .pipe gulp.dest './'
+## npm run coffee / npx gulp coffee: builds index.js from index.coffee etc.
+exports.coffee = coffee = ->
+  gulp.src 'tatamibari.coffee', ignore: 'gulpfile.coffee'
+  .pipe gulpCoffee()
+  .pipe gulpChmod 0o644
+  .pipe gulp.dest './'
 
+## npm run build / npx gulp build: all of the above
+exports.build = build = gulp.series pug, coffee
+
+## npm run watch / npx gulp watch: continuously update above
 exports.watch = watch = ->
-  gulp.watch '*.coffee', coffee
   gulp.watch '*.pug', pug
-  gulp.watch '*.styl', pug #stylus
+  gulp.watch '*.styl', pug
+  gulp.watch 'tatamibari.coffee', coffee
 
-exports.default = gulp.series ...[
-  gulp.parallel coffee, pug#, stylus
-]
+exports.default = gulp.parallel coffee, pug

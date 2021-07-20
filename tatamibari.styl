@@ -1,87 +1,83 @@
-table
+// These widths must match minorWidth and majorWidth in tatamibari.coffee
+minorWidth = 0.05
+majorWidth = 0.15
+
+@media print
+  .noprint
+    display: none
+
+.w-100
   width: 100%
-svg
-  width: 100%
-  height: 100%
+.text-left
+  text-align: left
+.text-right
+  text-align: right
+.align-middle
+  vertical-align: middle
+
 #symbols
   width: 0px
   height: 0px
-#header
-  margin-top: 20px
+svg
+  width: 100%
+  height: 100%
 
-.input
-  display: inline-block
-  margin: 0ex 1ex
-
-#solve
-  height: 40px
-
-// These widths must match minorWidth and majorWidth in sudoku.coffee
-svg .grid line
-  stroke-width: 0.05
-  stroke: #666
-  stroke-linecap: square
-
-  &.border
-    stroke-width: 0.15
-    stroke: black
-
-svg .edges line
-  stroke-width: 0.15
-  stroke: rgba(0,0,0,0)
-
-  &.on
-    stroke: black
-    stroke-linecap: square
-
-  &.toggle
-    cursor: pointer
-    stroke-width: 0.4
-
-    &:hover
-      stroke: hsla(50,100%,50%,0.5) // rgba(0,0,0,0.5)
-
-svg .squares
-  &.toggle g
-    cursor: pointer
-  rect
+  rect.background
     fill: white
-  &.toggle g:hover rect
-    fill: hsl(50,100%,80%)
-  g.selected rect
-    fill: hsl(50,100%,50%) // based on #ffda00 from NYTimes
-  //g.s0 rect
-  g.s1 rect
-    fill: #aaa
-  g.sundefined rect // uncovered
-    fill: hsl(0,100%,70%)
+    stroke: none
+  .grid
+    line
+      stroke-width: minorWidth
+      stroke: #666
+      stroke-linecap: square
+    rect.border
+      fill: none
+      stroke-width: majorWidth
+      stroke: black
 
-svg .errors
-  circle
-    fill: red
+  .edges line
+    stroke-width: majorWidth
+    stroke: rgba(0,0,0,0)
 
-#buttons
-  position: fixed
-  top: 0
-  left: 0
-  right: 0
-  text-align: center
-  user-select: none
+    &.on
+      stroke: black
+      stroke-linecap: square
 
-  div
-    display: inline-block
-    border: solid;
-    width: 25px
-    height: 25px
-    padding: 2px
-    text-align: center
-    font-weight: 700
-    font-size: 20px
-    background: #ddd
-    cursor: pointer
-    vertical-align: top
+    &.toggle
+      cursor: pointer
+      stroke-width: 0.4
 
-    &:hover { background: hsl(50,100%,80%); }
+      &:hover
+        stroke: hsla(50,100%,50%,0.5) // rgba(0,0,0,0.5)
 
-  #button-erase, #button-color
-    width: auto
+  .squares
+    &.toggle g
+      cursor: pointer
+    rect
+      fill: white
+    &.toggle g:hover rect
+      fill: hsl(50,100%,80%)
+    g.selected rect
+      fill: hsl(50,100%,50%) // based on #ffda00 from NYTimes
+    //g.s0 rect
+    g.s1 rect
+      fill: #aaa
+    g.sundefined rect // uncovered
+      fill: hsl(0,100%,70%)
+
+  .rectangles
+    rect
+      stroke: none
+      &.r0
+        fill: #fff
+      &.r1
+        fill: #aaa
+  .rectEdges
+    rect
+      fill: none
+      stroke-width: majorWidth
+      stroke: black
+
+  .errors
+    circle
+      fill: red

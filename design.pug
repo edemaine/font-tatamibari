@@ -6,6 +6,42 @@ html
     script(type="text/javascript", src="tatamibari.js")
     style
       include:stylus tatamibari.styl
+      :stylus
+        #header
+          margin-top: 20px
+        #buttons
+          position: fixed
+          top: 0
+          left: 0
+          right: 0
+          text-align: center
+          user-select: none
+
+          div
+            display: inline-block
+            border: solid;
+            width: 25px
+            height: 25px
+            padding: 2px
+            text-align: center
+            font-weight: 700
+            font-size: 20px
+            background: #ddd
+            cursor: pointer
+            vertical-align: top
+
+            &:hover { background: hsl(50,100%,80%); }
+
+          #button-erase, #button-color
+            width: auto
+
+        .input
+          display: inline-block
+          margin: 0ex 1ex
+
+        #solve
+          height: 40px
+
   body
     #buttons
       #button-p
@@ -19,11 +55,11 @@ html
           use(href="#v1")
       #button-erase erase
       #button-color color
-    table#header
+    table#header.w-100
       tr
-        td(style="text-align: left; vertical-align: middle")
+        td.text-left.align-middle
           h1 Tatamibari Designer
-        td(style="text-align: right; vertical-align: middle")
+        td.text-right.align-middle
           h2 by Jeffrey Bosboom, <A HREF="http://erikdemaine.org/">Erik&nbsp;Demaine</A>, and <A HREF="http://martindemaine.org">Martin&nbsp;Demaine</A>, 2019
     table
       tr
