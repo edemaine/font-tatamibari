@@ -103,12 +103,12 @@ class PuzzleDisplay
     .addClass 'rectangles'
     @gridGroup = @svg.group()
     .addClass 'grid'
-    @squaresGroup = @svg.group()
-    .addClass 'squares'
-    @rectEdgesGroup = @svg.group()
-    .addClass 'rectEdges'
     @edgesGroup = @svg.group()
     .addClass 'edges'
+    @rectEdgesGroup = @svg.group()
+    .addClass 'rectEdges'
+    @squaresGroup = @svg.group()
+    .addClass 'squares'
     @errorsGroup = @svg.group()
     .addClass 'errors'
     @drawRectangles()
@@ -156,10 +156,12 @@ class PuzzleDisplay
                .size 1, 1
 
   drawEdges: ->
+    @lines = {}
     @edgesGroup.clear()
     for xy of @puzzle.edges
       [x, y] = xy.split(',').map (f) -> parseFloat f
-      @edgesGroup.line Math.floor(x), Math.floor(y), Math.ceil(x), Math.ceil(y)
+      @lines[xy] = @edgesGroup
+      .line Math.floor(x), Math.floor(y), Math.ceil(x), Math.ceil(y)
       .addClass 'on'
 
   drawRectangles: ->
@@ -188,7 +190,108 @@ class PuzzleSolution extends PuzzleDisplay
       for y in [0...@puzzle.ny]
         @squares[[x,y]].group.attr 'class', "s#{@puzzle.color[[x,y]]}"
 
+add = (u,v) -> [u[0] + v[0], u[1] + v[1]]
+sub = (u,v) -> [u[0] - v[0], u[1] - v[1]]
+perp = (v) -> [-v[1], v[0]]
+
+edge2dir = (edge) ->
+  [
+    edge[0] - Math.floor edge[0]
+    edge[1] - Math.floor edge[1]
+  ]
+
 class PuzzlePlayer extends PuzzleDisplay
+  constructor: (...args) ->
+    super ...args
+    @highlightEnable()
+  highlightEnable: ->
+    @state = {}
+    @lines = {}
+    rt2o2 = Math.sqrt(2)/2
+    @highlight = @svg.rect rt2o2, rt2o2
+    .center 0, 0
+    .addClass 'target'
+    .opacity 0
+    event2coord = (e) =>
+      pt = @svg.point e.clientX, e.clientY
+      rotated =
+        x: rt2o2 * (pt.x + pt.y)
+        y: rt2o2 * (-pt.x + pt.y)
+      rotated.x /= rt2o2
+      rotated.y /= rt2o2
+      rotated.x -= 0.5
+      rotated.y -= 0.5
+      rotated.x = Math.round rotated.x
+      rotated.y = Math.round rotated.y
+      rotated.x += 0.5
+      rotated.y += 0.5
+      rotated.x *= rt2o2
+      rotated.y *= rt2o2
+      coord = [
+        0.5 * Math.round 2 * rt2o2 * (rotated.x - rotated.y)
+        0.5 * Math.round 2 * rt2o2 * (rotated.x + rotated.y)
+      ]
+      if 0 < coord[0] < @puzzle.nx and 0 < coord[1] < @puzzle.ny
+        coord
+      else
+        null
+    @svg.mousemove (e) =>
+      edge = event2coord e
+      if edge?
+        @highlight
+        .transform
+          rotate: 45
+          translate: edge
+        .opacity 0.333
+      else
+        @highlight.opacity 0
+    @svg.on 'mouseleave', (e) =>
+      @highlight.opacity 0
+    @svg.click (e) =>
+      edge = event2coord e
+      return unless edge?
+      @click edge
+  click: (edge, links = true) ->
+    if @lines[edge]?
+      @lines[edge].remove()
+      delete @lines[edge]
+    dir = edge2dir edge
+    @puzzle.edges[edge] =
+      switch @puzzle.edges[edge]
+        when undefined
+          #unless @centerMap[edge]
+            true
+          #else
+          #  false
+        when true
+          false
+        when false
+          undefined
+    if @puzzle.edges[edge] == false and
+       not document.getElementById('connectors').checked
+      @puzzle.edges[edge] = undefined
+    if @puzzle.edges[edge]?
+      if @puzzle.edges[edge] == false
+        dir = perp dir
+      p = sub edge, dir
+      q = add edge, dir
+      @lines[edge] = @edgesGroup.line p..., q...
+      .addClass if @puzzle.edges[edge] then 'on' else 'con'
+    if solved = @puzzle.checkSolved()
+      unless @wasSolved
+        @rectanglesGroup.opacity 0
+        @rectanglesGroup.animate().opacity 1
+    else
+      if @wasSolved
+        @rectanglesGroup.animate().opacity 0
+        .after => @rectanglesGroup.opacity null
+    @wasSolved = solved
+
+    if @linked? and links
+      for link in @linked when link != @
+        link.click edge, false
+
+class PuzzlePlayerEdge extends PuzzleDisplay
   drawEdges: ->
     @edgesGroup.clear()
     for xi in [0...@puzzle.nx]
@@ -210,7 +313,7 @@ class PuzzlePlayer extends PuzzleDisplay
 selected = null
 currentColor = 1
 
-class PuzzleEditor extends PuzzlePlayer
+class PuzzleEditor extends PuzzlePlayerEdge
   drawEmptySquares: true
   drawSquares: ->
     super()

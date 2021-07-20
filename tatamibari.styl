@@ -1,6 +1,7 @@
 // These widths must match minorWidth and majorWidth in tatamibari.coffee
 minorWidth = 0.05
 majorWidth = 0.15
+conWidth = 0.25
 
 @media print
   .noprint
@@ -42,6 +43,10 @@ svg
     &.on
       stroke: black
       stroke-linecap: square
+    &.con
+      stroke: gray
+      stroke-width: conWidth
+      stroke-linecap: round
 
     &.toggle
       cursor: pointer
@@ -81,3 +86,10 @@ svg
   .errors
     circle
       fill: red
+
+  .target
+    fill: purple
+    cursor: pointer
+    /.font-solved &
+      cursor: default
+      opacity: 0
