@@ -263,10 +263,7 @@ class PuzzlePlayer extends PuzzleDisplay
     @puzzle.edges[edge] =
       switch @puzzle.edges[edge]
         when undefined
-          #unless @centerMap[edge]
-            true
-          #else
-          #  false
+          true
         when true
           false
         when false
@@ -281,6 +278,7 @@ class PuzzlePlayer extends PuzzleDisplay
       q = add edge, dir
       @lines[edge] = @edgesGroup.line p..., q...
       .addClass if @puzzle.edges[edge] then 'on' else 'con'
+    @drawErrors()
     if solved = @puzzle.checkSolved()
       @svg.addClass 'solved'
     else
