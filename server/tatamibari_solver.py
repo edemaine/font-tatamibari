@@ -5,7 +5,6 @@ import sys, collections, z3, re, argparse
 from enum import Enum
 from operator import itemgetter
 from typing import List, Set, Dict, Iterator
-warn = print
 
 Point = collections.namedtuple('Point', ['r', 'c'])
 Rect = collections.namedtuple('Rect', ['r', 'c', 'h', 'w'])
@@ -107,10 +106,10 @@ def solve(puzzle: Puzzle, forced_rects: Set[Rect] = frozenset(),
 
     for cell, rects in cell_to_rects.items():
         if not rects:
-            warn('cell', cell, 'has no covering rects')
+            print('cell', cell, 'has no covering rects')
     for clue_cell, rects in clue_to_rects.items():
         if not rects:
-            warn('clue', puzzle.clues[clue_cell], 'in', clue_cell, 'has no candidate rects')
+            print('clue', puzzle.clues[clue_cell], 'in', clue_cell, 'has no candidate rects')
 
     solver = z3.Optimize()
     for c in puzzle.cells:
@@ -161,8 +160,8 @@ def solve(puzzle: Puzzle, forced_rects: Set[Rect] = frozenset(),
                                 solver.add_soft(z3.PbLe([(r2, 1), (r3, 1), (r4, 1)], 2), 1, 'corner')
                             else:
                                 raise AssertionError('bad corner_constraints: ' + corner_constraints)
-                for r2 in ll_to_rects.get(Point(c.r-1, c.c), []):
-                    for r3 in lr_to_rects.get(Point(c.r-1, c.c+1), []):
+                for r2 in lr_to_rects.get(Point(c.r-1, c.c), []):
+                    for r3 in ll_to_rects.get(Point(c.r-1, c.c+1), []):
                         for r4 in ul_to_rects.get(Point(c.r, c.c+1), []):
                             if corner_constraints == 'hard':
                                 solver.add(z3.PbLe([(r2, 1), (r3, 1), (r4, 1)], 2))
@@ -170,8 +169,8 @@ def solve(puzzle: Puzzle, forced_rects: Set[Rect] = frozenset(),
                                 solver.add_soft(z3.PbLe([(r2, 1), (r3, 1), (r4, 1)], 2), 1, 'corner')
                             else:
                                 raise AssertionError('bad corner_constraints: ' + corner_constraints)
-                for r2 in ll_to_rects.get(Point(c.r-1, c.c-1), []):
-                    for r3 in lr_to_rects.get(Point(c.r-1, c.c), []):
+                for r2 in lr_to_rects.get(Point(c.r-1, c.c-1), []):
+                    for r3 in ll_to_rects.get(Point(c.r-1, c.c), []):
                         for r4 in ur_to_rects.get(Point(c.r, c.c-1), []):
                             if corner_constraints == 'hard':
                                 solver.add(z3.PbLe([(r2, 1), (r3, 1), (r4, 1)], 2))
