@@ -4,7 +4,8 @@ majorWidth = 0.15
 
 global?.XMLHttpRequest ?= require('xmlhttprequest').XMLHttpRequest
 
-server = 'http://demaine.csail.mit.edu/tatamibari/'
+designLink = 'http://tatamibari.csail.mit.edu:8080/design.html'
+server = 'http://tatamibari.csail.mit.edu:8080/server/'
 
 symbolMap =
   '-': 'h'
@@ -656,6 +657,20 @@ fontGUI = ->
 
   document.getElementById('reset').addEventListener 'click', ->
     app.render()
+
+  document.getElementById('designLink').href = designLink
+  document.getElementById('designLinks').innerHTML = (
+    for char of window.font
+      """<a href="javascript:designOpen('#{char}')">#{char}</a>"""
+  ).join ',\n'
+
+window?.designOpen = (char) ->
+  {nx, ny, clues, color} = window.font[char]
+  puzzle = new Puzzle nx, ny, clues, color
+  ascii = puzzle.toAscii()
+  window.open designLink +
+    "?puzzle=#{encodeURIComponent ascii.clues}" +
+    "&color=#{encodeURIComponent ascii.color}"
 
 window?.onload = ->
   if document.getElementById 'design'
