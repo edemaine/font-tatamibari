@@ -10,9 +10,10 @@ from that repository.
 To get it running, you need a CGI web server (e.g. Apache) with the following
 installed:
 
-* Python 3.5+
+* Python 3.6+
 * Z3
 * `pip3 install z3-solver`
+* `pip3 install psutil`
 
 Use the included `.htaccess` file for Apache.
 
