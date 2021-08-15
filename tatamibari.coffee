@@ -210,7 +210,6 @@ class PuzzlePlayer extends PuzzleDisplay
     super ...args
     @highlightEnable()
   highlightEnable: ->
-    @state = {}
     @lines = {}
     rt2o2 = Math.sqrt(2)/2
     @highlight = @svg.rect rt2o2, rt2o2
