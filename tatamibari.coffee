@@ -637,6 +637,7 @@ fontGUI = ->
   app = new FontWebappHTML
     root: '#output'
     sizeSlider: '#size'
+    sizeName: 'size'
     charWidth: 225
     charPadding: 5
     charKern: 0
@@ -656,6 +657,8 @@ fontGUI = ->
 
   document.getElementById('reset').addEventListener 'click', ->
     app.render()
+  document.getElementById('nohud')?.addEventListener 'click', ->
+    app.furls.set 'hud', false
 
   document.getElementById('designLink').href = designLink
   document.getElementById('designLinks').innerHTML = (
